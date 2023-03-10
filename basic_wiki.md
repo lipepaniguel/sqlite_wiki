@@ -136,9 +136,9 @@ Note que diferentemente de `ctrl` + `D`, utilizar `;` faz com que o prompt não 
 
 ## Sintaxe
 Como citado anteriormente, o prompt espera receber como input um *comando* ou um *statement*, daqui em diante referido como *declaração*. Os comandos como já vistos, iniciam-se com um `.` (ponto final) seguido do comando propriamente dito, em letras minúsculas.  
-As declarações se iniciam com uma palavra-chave, tais como `SELECT`, `INSERT`, `UPDATE`, `DELETE`, etc, e finalizadas com um `;` (ponto e vírgula).  
-No caso das declarações, ou mais precisamente, dos identificadores que as compõe, o SQLite é insensível a maiúsculas e minúsculas. Isto é, tanto as palavras-chave quanto o nome de tabelas, restrições e tipos podem ser escritos em maiúscula ou minúscula, ou utilizando ambas ao mesmo tempo.  
-Entretanto existe uma regra que não é opcional, todo identificador deve iniciar com uma letra ou `_` (sublinhado). Além disso, são válidos apenas o sublinhado `_` e caracteres alfanuméricos.  
+As declarações, por outro lado, se iniciam com uma palavra-chave, tais como `SELECT`, `INSERT`, `UPDATE`, `DELETE`, etc, e devem ser finalizadas com um `;` (ponto e vírgula).  
+No caso das declarações, ou mais precisamente, dos identificadores que as compõe, o SQLite é insensível a maiúsculas e minúsculas. Isto é, tanto as palavras-chave quanto o nome de tabelas, restrições e tipos podem ser escritos em maiúscula ou minúscula, ou uma combinação de ambas.  
+Entretanto existe uma regra que não é opcional, todo identificador deve iniciar com uma letra ou `_` (sublinhado). Além disso, apenas os caracteres alfanuméricos e o sublinhado `_` são considerados como válidos para compor o nome dos identificadores.  
 Declarações ainda podem ser feitas utilizando múltiplas linhas e espaço em branco **entre** cada um dos identificadores.  
 Todos os exemplos abaixo representam declarações válidas.
 ```SQL
@@ -155,17 +155,18 @@ CREATE TABLE Tabela (
 ```
 
 ## Convenções e boas práticas para nomenclatura
-Se você observar o exemplo anterior, notará que o SQLite aceita uma boa variedade de combinações para se utilizar na nomenclatura de tabelas e colunas. Qual seria, então, o jeito correto de nomear tabelas e colunas - se é que ele existe?  
-De fato, não existe uma regra universal, mas ao decorrer dos anos parece que alguns padrões foram se tornando mais comuns e mais reproduzidos do que outros. O link abaixo traz uma discussão a respeito desse aspecto:  
+Se você observar o exemplo anterior, notará que o SQLite aceita uma boa variedade de combinações para se utilizar na nomenclatura de tabelas e colunas. Qual seria, então, o jeito correto de nomear tabelas e colunas - se é que algo assim existe?  
+De fato, não existe uma regra universal, mas ao decorrer dos anos parece que alguns padrões foram se tornando mais comuns e mais reproduzidos do que outros. O link abaixo traz uma discussão a respeito de possíveis convenções ou boas práticas:
+
 [Stackoverflow - database table and column naming conventions](https://stackoverflow.com/questions/7662/database-table-and-column-naming-conventions)
 
-O mais importante, deixando de lado um pouco as discussões, é ser consistente depois que uma convenção for adotada. Mas se você estiver se sentindo inseguro sobre qual delas adotar, o que eu recomendaria seria algo como o exemplo abaixo:
+O mais importante, deixando de lado um pouco as discussões, é ser consistente depois que uma convenção for adotada. Mas se você estiver se sentindo inseguro sobre qual modelo adotar, eu recomendaria algo como o exemplo abaixo:
 ```SQL
 CREATE TABLE NomeDaTabelaSingular (
     NomeDaColunaSingular TEXT
 );
 ```
-Ou seja, PascalCase para ambos os nomes de tabela e coluna, bem como mantendo as duas no singular e evitando tanto quanto possível o uso de sublinhado \``_`\` e numerais.
+Ou seja, *PascalCase* para ambos os nomes de tabela e coluna, bem como mantendo as duas no singular e evitando tanto quanto possível o uso de sublinhado \``_`\` e numerais.
 
 ## Data Type
 Todos os diversos tipos de dados aceitos pelo SQLite são condensados em apenas 5 para compor suas classes de armazenamento, são eles: 
@@ -197,41 +198,46 @@ Nesse sentido, o SQLite trabalha com um conceito de *type affinity* para as suas
 Após essa pequena introdução, é chegada a hora de abordar finalmente a parte prática. Comecemos com a criação do banco de dados.
 
 ### Criando um banco de dados
-Criar um novo banco de dados em SQLite é extremamente simples. À partir do terminal, basta inserir `sqlite3` seguido de um espaço e do nome desejado para o banco de dados, seguido por fim da extensão `.db`. Observe o exemplo abaixo:
+Criar um novo banco de dados SQLite é extremamente simples. À partir do terminal, basta inserir `sqlite3` seguido de um espaço em branco e do nome desejado para o banco de dados, e por fim da extensão `.db`.  
+Conforme o exemplo abaixo:
 ```
-$ sqlite3 ExemploDeDataBase.db
+$ sqlite3 CriandoUmBancoDeDados.db
 ```
+Note que o banco de dados é criado utilizando um comando no próprio terminal, já que o SQLite não é capaz de criar por si mesmo o arquivo que servirá como banco de dados. Não existe, portanto, nenhuma palavra-chave como "CREATE DATABASE", por exemplo, disponível no CLI do SQLite.
 
 ### Verificando
-Apesar do comando anterior criar uma nova base de dados, ele não cria o arquivo, mas você pode verificar se o banco de dados foi criado corretamente, checando se o prompt do SQLite foi aberto. Como no exemplo abaixo.
+Apesar do comando anterior criar um novo banco de dados, ele não cria automaticamente o arquivo correspondente. Isso se dá pelo fato do SQLite não criar de imediato um banco de dados vazio. Mas você pode verificar se o banco de dados foi criado corretamente, checando se o prompt do SQLite foi aberto. Como no exemplo abaixo.
 ```
 SQLite version 3.37.2 2022-01-06 13:25:41
 Enter ".help" for usage hints.
 sqlite>
 ```
-Uma outra forma de verificar a existência da base de dados é utilizar o comando `.databases`, que retornará uma lista de todas as bases de dados que estão atualmente com a conexão aberta.
+Uma outra forma de verificar a existência do banco de dados é utilizar o comando `.databases`, que dará o processo de criação encerrado e retornará uma lista de todas as bases de dados que estão atualmente com a conexão aberta.
 ```
 sqlite> .databases
 ```
-O comando também cria automaticamente um arquivo `.db` vazio com o nome da base de dados, dentro do diretório.
+Se o arquivo `.db` com o respectivo nome do banco de dados ainda não tiver sido gerado, o comando irá criar um banco de dados vazio dentro do atual diretório.
+
+### Removendo um banco de dados
+Do mesmo modo que não existe um modo de criar um banco de dados à partir do CLI, também não existe nenhuma palavra-chave como "DROP DATABASE", capaz de remover um banco de dados já criado. Para apagar definitivamente um banco de dados, deve-se deletar diretamente o arquivo `.db` correspondente que está presente no diretório do sistema.  
 
 ### Criando Tabela
-Para se criar uma tabela bastaria apenas a seguinte sintaxe:
+Apenas a seguinte sintaxe bastaria para se criar uma tabela em SQLite:
 ```SQL
 CREATE TABLE NomeDaTabela (NomeDaColuna);
 ```
 Entretanto talvez não seja a melhor prática, tendo em vista que o SQLite nos oferece algumas opções para customizarmos nossa tabela.  
-Um outro exemplo, portanto, de se criar uma tabela, talvez pudesse ser algo como:
+Um outro exemplo, portanto, seria algo como:
 ```SQL
 CREATE TABLE IF NOT EXISTS NomeDaTabela (
-  NomeDaColunaUm INTEGER PRIMARY KEY AUTOINCREMENT,
+  NomeDaColunaUm INTEGER PRIMARY KEY,
   NomeDaColunaDois TEXT NOT NULL,
   NomeDaColunaTres INTEGER DEFAULT 0
-) WITHOUT ROWID;
+);
 ```
-Na primeira linha: iniciamos com as palavras-chave `CREATE TABLE`, para se criar uma nova tabela. `IF NOT EXISTS`, como já discutido, é opcional, mas sem ele, a tentativa de se criar uma nova tabela com um nome que já existe resultará em um erro. Por fim, acrescentamos o nome da tabela.
+Na primeira linha: iniciamos com as palavras-chave `CREATE TABLE`, para se criar uma nova tabela. Como já discutido, a cláusula `IF NOT EXISTS` é opcional, mas sem ela, a tentativa de se criar uma nova tabela com um nome que já existe retornará um erro. Por fim, acrescentamos o nome da tabela.
 Em seguida, entre parênteses, detalhamos cada uma das colunas que desejamos para a nossa tabela, atribuindo um nome, seguido do tipo sugerido para a respectiva coluna.  
-Além disso, o SQLite permite que apliquemos algumas restrições às colunas, reforçando desse modo a conformidade e a confiabilidade do banco de dados que estamos criando. Abaixo pode-se observar palavras-chave disponíveis no SQLite, que atuam como restrições à uma determinada tabela:
+Além disso, o SQLite permite que apliquemos algumas restrições às colunas, como `PRIMARY KEY` ou então `NOT NULL`, presentes no exemplo acima. Por meio delas, é possível restringir os valores presentes na respectiva coluna. Reforçando, desse modo, a conformidade e a confiabilidade do banco de dados que estamos criando. Abaixo, pode-se observar palavras-chave disponíveis no SQLite, que atuam como restrições à uma determinada tabela:
 <table>
   <tr>
     <td>PRIMARY KEY</td>
@@ -253,3 +259,11 @@ Além disso, o SQLite permite que apliquemos algumas restrições às colunas, r
     <td>Garante que todos os valores da coluna satisfazem um determinada condição.</td>
   </tr>
 </table>
+
+### Removendo Tabela
+Para remover ou então *deletar* uma tabela do banco de dados, basta utilizar a palavra-chave `DROP TABLE`, seguido do nome da tabela que se deseja remover. Lembrando que essa é uma ação irreversível.  
+Observe o exemplo abaixo:
+```SQL
+DROP TABLE IF EXISTS NomeDaTabela;
+```
+A cláusula `IF EXISTS` garante que não se retorne um erro se por um acaso a referida tabela não estiver presente no banco de dados.
